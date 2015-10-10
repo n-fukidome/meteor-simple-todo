@@ -31,15 +31,10 @@ if Meteor.isClient
 
   Template.body.events
     'submit .new-task': (event) ->
-      # Prevent default browser form submit
       event.preventDefault()
-      # Get value from form element
       text = event.target.text.value
-      # Insert a task into the collection
       Meteor.call 'addTask', text
-      # Clear form
       event.target.text.value = ''
-      return
     'change .hide-completed input': (event) ->
       Session.set 'hideCompleted', event.target.checked
       return
@@ -72,27 +67,36 @@ if Meteor.isClient
   Template.OwnerForms.helpers
     showDateForm: ->
       Session.get('showDateForm') == this._id
+    showChildForm: ->
+      Session.get('showChildForm') == this._id
 
   Template.OwnerForms.events
     'click .toggle-private': ->
       Meteor.call 'setPrivate', @_id, !@private
-      return
     'click .show-date': ->
       unless Session.get('showDateForm')
         Session.set 'showDateForm', this._id
       else
         Session.set 'showDateForm', null
-      return
-    'click .set-date': (event, template) ->
+    'click .show-child': ->
+      unless Session.get('showChildForm')
+        Session.set 'showChildForm', this._id
+      else
+        Session.set 'showChildForm', null
+    'click .set-date': (event) ->
       date = event.target.parentNode.children[1].value
       Meteor.call 'setDate', @_id, date
       Session.set 'showDateForm', null
+    'submit .new-child-task': (event) ->
+      event.preventDefault()
+      text = event.target[0].value
+      Meteor.call 'addChildTask', text, this
+      Session.set 'showChildForm', null
 
   Accounts.ui.config passwordSignupFields: 'USERNAME_ONLY'
 
 Meteor.methods
   addTask: (text) ->
-    # Make sure the user is logged in before inserting a task
     if !Meteor.userId()
       throw new (Meteor.Error)('not-authorized')
     Tasks.insert
@@ -100,7 +104,17 @@ Meteor.methods
       createdAt: new Date
       owner: Meteor.userId()
       username: Meteor.user().username
-    return
+
+  addChildTask: (text, parent) ->
+    # if !Meteor.userId()
+    #   throw new (Meteor.Error)('not-authorized')
+    Tasks.insert
+      text: text
+      parentId: parent._id
+      private: parent.private
+      createdAt: new Date
+      owner: Meteor.userId()
+      username: Meteor.user().username
 
   copyTask: (task) ->
     if !Meteor.userId()

@@ -21,4 +21,20 @@
       <button class="set-date">Set</button>
     {{/if}}
   </div>
+
+  <div class="about-chilren">
+    <button class="show-child">
+      {{#if showChildForm}}
+        Hide Form
+      {{else}}
+        Set Task
+      {{/if}}
+    </button>
+
+    {{#if showChildForm}}
+      <form class="new-child-task">
+        <input type="text" name="text" placeholder="Type to add new tasks" />
+      </form>
+    {{/if}}
+  </div>
 </template>
