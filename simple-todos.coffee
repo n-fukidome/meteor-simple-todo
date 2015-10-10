@@ -1,5 +1,3 @@
-Tasks = new (Mongo.Collection)('tasks')
-
 if Meteor.isServer
   # This code only runs on the server
   # Only publish tasks that are public or belong to the current user
@@ -7,7 +5,9 @@ if Meteor.isServer
     Tasks.find $or: [
       { private: $ne: true }
       { owner: @userId }
+      { date: @date}
     ]
+
 
 if Meteor.isClient
   # This code only runs on the client
@@ -44,6 +44,8 @@ if Meteor.isClient
   Template.task.helpers
     isOwner: ->
       @owner == Meteor.userId()
+    haveDate: ->
+      Session.get('haveDate')
 
   Template.task.events
     'click .toggle-checked': ->
@@ -60,6 +62,13 @@ if Meteor.isClient
     'click .toggle-private': ->
       Meteor.call 'setPrivate', @_id, !@private
       return
+    'click .show-date': ->
+      Session.set 'haveDate', !!!Session.get('haveDate')
+      return
+    'submit form': (event, template) ->
+      date = event.target[0].value
+      Meteor.call 'setDate', @_id, date
+      Session.set 'haveDate', false
 
   Accounts.ui.config passwordSignupFields: 'USERNAME_ONLY'
 
@@ -97,4 +106,12 @@ Meteor.methods
     if task.owner != Meteor.userId()
       throw new (Meteor.Error)('not-authorized')
     Tasks.update taskId, $set: private: setToPrivate
+    return
+
+  setDate: (taskId, date) ->
+    task = Tasks.findOne(taskId)
+    console.log task, date
+    if task.owner != Meteor.userId()
+      throw new (Meteor.Error)('not-authorized')
+    Tasks.update taskId, $set: date: date
     return
