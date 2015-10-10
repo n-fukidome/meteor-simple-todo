@@ -117,11 +117,7 @@ li.private {
   border-color: #ddd;
 }
 
-header .hide-completed {
-  float: right;
-}
-
-header .only-mine {
+header label {
   float: right;
 }
 

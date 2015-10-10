@@ -7,16 +7,8 @@
     <header>
       <h1>Todo List ({{incompleteCount}})</h1>
  
-      <label class="hide-completed"  >
-        <input type="checkbox" checked="{{hideCompleted}}" />
-        Hide Completed Tasks
-      </label>
-
-      <label class="only-mine"  >
-        <input type="checkbox" checked="{{onlyMine}}" />
-        Show Only My Tasks
-      </label>
-
+      {{> FilterLabels}}
+      <br>
       {{> loginButtons}}
 
       {{#if currentUser}}

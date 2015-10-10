@@ -20,12 +20,10 @@ if Meteor.isClient
         query["owner"] = Meteor.userId()
       if Session.get('hideCompleted')
         query["checked"] = { $ne: true }
+      if Session.get('onlyParent')
+        query["parentId"] = { $exists : true}
       Tasks.find(query, sort: createdAt: -1)
 
-    hideCompleted: ->
-      Session.get 'hideCompleted'
-    onlyMine: ->
-      Session.get 'onlyMine'
     incompleteCount: ->
       Tasks.find(checked: $ne: true).count()
 
@@ -35,12 +33,25 @@ if Meteor.isClient
       text = event.target.text.value
       Meteor.call 'addTask', text
       event.target.text.value = ''
+
+  Template.FilterLabels.events
     'change .hide-completed input': (event) ->
       Session.set 'hideCompleted', event.target.checked
       return
     'change .only-mine input': (event) ->
       Session.set 'onlyMine', event.target.checked
       return
+    'change .only-parent input': (event) ->
+      Session.set 'onlyParent', event.target.checked
+      return
+
+  Template.FilterLabels.helpers
+    hideCompleted: ->
+      Session.get 'hideCompleted'
+    onlyMine: ->
+      Session.get 'onlyMine'
+    onlyParent: ->
+      Session.get 'onlyParent'
 
   Template.task.helpers
     isOwner: ->
