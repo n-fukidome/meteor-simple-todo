@@ -18,3 +18,5 @@ ecmascript              # Enable ECMAScript2015+ syntax in app code
 
 accounts-ui
 accounts-password
+coffeescript
+rajit:bootstrap3-datepicker
