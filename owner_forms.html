@@ -1,0 +1,24 @@
+<template name="OwnerForms">
+  <button class="toggle-private">
+    {{#if private}}
+      Private
+    {{else}}
+      Public
+    {{/if}}
+  </button>
+
+  <div class="select-date">
+    <button class="show-date">
+      {{#if showDateForm}}
+        Hide Form
+      {{else}}
+        Set Date
+      {{/if}}
+    </button>
+
+    {{#if showDateForm}}
+      <input type="date" name="task-date" class="set-task-date" />
+      <button class="set-date">Set</button>
+    {{/if}}
+  </div>
+</template>

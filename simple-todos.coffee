@@ -44,8 +44,6 @@ if Meteor.isClient
   Template.task.helpers
     isOwner: ->
       @owner == Meteor.userId()
-    haveDate: ->
-      Session.get('haveDate')
 
   Template.task.events
     'click .toggle-checked': ->
@@ -59,16 +57,30 @@ if Meteor.isClient
       Meteor.call 'deleteTask', @_id
       # Tasks.remove(this._id);
       return
+    'click .copy': ->
+      task = Tasks.findOne(@_id)
+      ret = confirm("Do you copy this task(#{task?.text})?")
+      return unless ret
+      Meteor.call 'copyTask', task
+
+  Template.OwnerForms.helpers
+    showDateForm: ->
+      Session.get('showDateForm') == this._id
+
+  Template.OwnerForms.events
     'click .toggle-private': ->
       Meteor.call 'setPrivate', @_id, !@private
       return
     'click .show-date': ->
-      Session.set 'haveDate', !!!Session.get('haveDate')
+      unless Session.get('showDateForm')
+        Session.set 'showDateForm', this._id
+      else
+        Session.set 'showDateForm', null
       return
-    'submit form': (event, template) ->
-      date = event.target[0].value
+    'click .set-date': (event, template) ->
+      date = event.target.parentNode.children[1].value
       Meteor.call 'setDate', @_id, date
-      Session.set 'haveDate', false
+      Session.set 'showDateForm', null
 
   Accounts.ui.config passwordSignupFields: 'USERNAME_ONLY'
 
@@ -82,6 +94,17 @@ Meteor.methods
       createdAt: new Date
       owner: Meteor.userId()
       username: Meteor.user().username
+    return
+
+  copyTask: (task) ->
+    if !Meteor.userId()
+      throw new (Meteor.Error)('not-authorized')
+    Tasks.insert
+      text: task.text
+      createdAt: new Date
+      owner: Meteor.userId()
+      username: Meteor.user().username
+      date: task.date
     return
 
   deleteTask: (taskId) ->

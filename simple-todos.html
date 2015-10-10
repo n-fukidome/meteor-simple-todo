@@ -38,23 +38,11 @@
     <span class="text"><strong>{{username}}</strong> - {{text}}- {{date}}</span>
 
     {{#if isOwner}}
-      <button class="toggle-private">
-        {{#if private}}
-          Private
-        {{else}}
-          Public
-        {{/if}}
+      {{> OwnerForms}}
+    {{else}}
+      <button class="copy">
+        Copy
       </button>
-
-      <button class="show-date">
-        Set Date
-      </button>
-      {{#if haveDate}}
-        <form>
-          <input type="date" name="task-date" class="set-task-date">
-          <input type="submit" class="set-date"/>
-        </form>
-      {{/if}}
     {{/if}}
   </li>
 </template>
