@@ -106,6 +106,10 @@ header .hide-completed {
   float: right;
 }
 
+header .only-mine {
+  float: right;
+}
+
 .toggle-private {
   margin-left: 5px;
 }

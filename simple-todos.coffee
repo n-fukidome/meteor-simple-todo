@@ -15,14 +15,17 @@ if Meteor.isClient
 
   Template.body.helpers
     tasks: ->
+      query = {}
+      if Session.get('onlyMine')
+        query["owner"] = Meteor.userId()
       if Session.get('hideCompleted')
-        # If hide completed is checked, filter tasks
-        Tasks.find { checked: $ne: true }, sort: createdAt: -1
-      else
-        # Otherwise, return all of the tasks
-        Tasks.find {}, sort: createdAt: -1
+        query["checked"] = { $ne: true }
+      Tasks.find(query, sort: createdAt: -1)
+
     hideCompleted: ->
       Session.get 'hideCompleted'
+    onlyMine: ->
+      Session.get 'onlyMine'
     incompleteCount: ->
       Tasks.find(checked: $ne: true).count()
 
@@ -39,6 +42,9 @@ if Meteor.isClient
       return
     'change .hide-completed input': (event) ->
       Session.set 'hideCompleted', event.target.checked
+      return
+    'change .only-mine input': (event) ->
+      Session.set 'onlyMine', event.target.checked
       return
 
   Template.task.helpers
